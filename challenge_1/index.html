@@ -1,2 +1,44 @@
-
-
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="app.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+  <body>
+    <div id="game">
+      <div id="top-menu">
+      </div>
+      <div id="board">
+        <div id="cell-0" class="cell"></div>
+        <div id="cell-1" class="cell"></div>
+        <div id="cell-2" class="cell"></div>
+        <div id="cell-3" class="cell"></div>
+        <div id="cell-4" class="cell"></div>
+        <div id="cell-5" class="cell"></div>
+        <div id="cell-6" class="cell"></div>
+        <div id="cell-7" class="cell"></div>
+        <div id="cell-8" class="cell"></div>
+      </div>
+      <h1 id="message">
+      Welcome to Tic Tac Toe!
+      </h1>
+      <button id="reset">Reset Game</button>
+      <form>
+        <input id="input1" type="text" placeholder="Player 1"/>
+        <input id="input2" type="text" placeholder="Player 2"/>
+        <input type="submit" value="Begin Game!"/>
+      </form>
+      <div id="info">
+        <div id="players">
+          <div id="player1"></div>
+          <div id="player2"></div>
+        </div>
+        <div id="score-board">
+          <div id="score1"></div>
+          <div id="score2"></div>
+        </div>
+      </div>
+    </div>
+    <script>App.init()</script>
+  </body>
+</html>
