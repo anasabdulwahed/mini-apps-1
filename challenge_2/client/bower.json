@@ -1,0 +1,21 @@
+{
+  "name": "csv_client",
+  "homepage": "https://github.com/leealbert95/hrsf93-mini-apps-1",
+  "authors": [
+    "Hack Reactor Student <student@hackreactor.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "underscore": "^1.8.3"
+  }
+}

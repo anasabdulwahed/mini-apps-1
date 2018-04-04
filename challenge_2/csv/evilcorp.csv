@@ -1,0 +1,10 @@
+id,parentId,firstName,lastName,county,city,role,salary
+0,null,Phillip,Price,San Mateo,San Mateo,CEO,1000000
+1,0,Tyrell,Wellick,San Mateo,Pacifica,CTO,900000
+2,1,Smitty,McSmitterson,San Mateo,Redwood City,Technical Manager,280000
+3,2,Elliot,Alderson,Orange,Irvine,Software Engineer,180000
+4,2,Aaron,Takahashi,San Mateo,Albany,Software Engineer,180000
+5,1,Allen,McPeterson,Los Angeles,Los Angeles,General Manager,280000
+6,5,Robert,Lee,Orange,Irvine,Risk Management,180000
+7,5,Angela,Moss,San Mateo,Albany,Risk Management,180000
+8,0,Beth,Johnson,San Francisco,San Francisco,Treasurer,750000
