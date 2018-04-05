@@ -1,0 +1,14 @@
+"use strict";
+
+var Cell = function Cell(props) {
+  var coordinates = props.coordinates,
+      onCellClick = props.onCellClick,
+      color = props.color,
+      style = props.style;
+
+
+  return React.createElement("div", { style: _.extend({ backgroundColor: color }, style) });
+};
+
+window.Cell = Cell;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL2NsaWVudC9jZWxsLmpzeCJdLCJuYW1lcyI6WyJDZWxsIiwicHJvcHMiLCJjb29yZGluYXRlcyIsIm9uQ2VsbENsaWNrIiwiY29sb3IiLCJzdHlsZSIsIl8iLCJleHRlbmQiLCJiYWNrZ3JvdW5kQ29sb3IiLCJ3aW5kb3ciXSwibWFwcGluZ3MiOiI7O0FBQUEsSUFBSUEsT0FBTyxTQUFQQSxJQUFPLENBQUNDLEtBQUQsRUFBVztBQUFBLE1BQ2RDLFdBRGMsR0FDNkJELEtBRDdCLENBQ2RDLFdBRGM7QUFBQSxNQUNEQyxXQURDLEdBQzZCRixLQUQ3QixDQUNERSxXQURDO0FBQUEsTUFDWUMsS0FEWixHQUM2QkgsS0FEN0IsQ0FDWUcsS0FEWjtBQUFBLE1BQ21CQyxLQURuQixHQUM2QkosS0FEN0IsQ0FDbUJJLEtBRG5COzs7QUFHcEIsU0FDRSw2QkFBSyxPQUFPQyxFQUFFQyxNQUFGLENBQVMsRUFBQ0MsaUJBQWlCSixLQUFsQixFQUFULEVBQW1DQyxLQUFuQyxDQUFaLEdBREY7QUFJRCxDQVBEOztBQVNBSSxPQUFPVCxJQUFQLEdBQWNBLElBQWQiLCJmaWxlIjoiY2VsbC5qcyIsInNvdXJjZXNDb250ZW50IjpbInZhciBDZWxsID0gKHByb3BzKSA9PiB7XG4gIHZhciB7IGNvb3JkaW5hdGVzLCBvbkNlbGxDbGljaywgY29sb3IsIHN0eWxlIH0gPSBwcm9wcztcbiAgXG4gIHJldHVybiAoIFxuICAgIDxkaXYgc3R5bGU9e18uZXh0ZW5kKHtiYWNrZ3JvdW5kQ29sb3I6IGNvbG9yfSwgc3R5bGUpfT5cbiAgICA8L2Rpdj5cbiAgKTtcbn1cblxud2luZG93LkNlbGwgPSBDZWxsOyJdfQ==
