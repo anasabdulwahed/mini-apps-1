@@ -1,0 +1,59 @@
+
+#score-board {
+  display: grid;
+  grid-template-columns: repeat(10, 92px);
+  width: 922px;
+  border: 1px solid black;
+  margin-bottom: 100px;
+}
+
+#pins-grid {
+  display: grid;
+  grid-template-columns: 50px 50px 50px;
+  width: 152px;
+}
+
+.turn {
+  display: inline-block;
+  height: 45px;
+  border: 1px solid black; 
+  vertical-align: middle;
+  line-height: 45px; 
+}
+
+.turns-section {
+  height: 45px;
+}
+
+.pins {
+  display: inline-block;
+  height: 50px;
+  width: 50px;
+  border: 1px solid black;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px;
+}
+
+.head-frame {
+  display: inline-block;
+  height: 30px;
+  width: 92px;
+  border: 1px solid black;
+  text-align: center;
+  line-height: 30px;
+}
+
+.score-frame {
+  display: inline-block;
+  height: 91px;
+  width: 92px;
+  border: 1px solid black;
+  text-align: center;
+}
+
+.sub-total {
+  height: 45px;
+  vertical-align: middle;
+  line-height: 45px; 
+}
