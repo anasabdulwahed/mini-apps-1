@@ -6,7 +6,8 @@ const Square = ({coords, cell, onClick}) => {
     <div style={{ height: '50px', backgroundColor: color }} onClick={() => onClick(coords)}>
       {chip ? <div className="chip" style={{ 
         backgroundColor: chip.color, 
-        border: chip.isKing ? '5px solid yellow' : null }}
+        border: chip.isKing ? '5px solid yellow' : null, 
+        marginTop: chip.isKing ? '0px' : '5px'}}
       >
       </div> : null}
     </div>

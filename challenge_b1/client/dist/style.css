@@ -2,8 +2,7 @@
   height: 40px;
   width: 40px;
   border-radius: 20px;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  margin: auto;
+  margin-top: 5px;
+  margin-bottom: auto;
 }
