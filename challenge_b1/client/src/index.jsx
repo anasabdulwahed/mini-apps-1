@@ -6,13 +6,17 @@ import BoardUtils from './BoardUtils.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    let board = BoardUtils.initBoard();
+    let  { board, player1Chips, player2Chips } = BoardUtils.initBoard();
     this.state = {
       board: board,
-      players: [{name: 'Player 1', color: 'red', chipCount: 12}, {name: 'Player 2', color: 'blue', chipCount: 12}],
+      players: [
+        {name: 'Player 1', color: 'red', chipCount: 12, chips: player1Chips}, 
+        {name: 'Player 2', color: 'blue', chipCount: 12, chips: player2Chips}
+      ],
       activePlayerIndex: 0,
       pickedChip: null,
-      placedChip: true
+      placedChip: true,
+      gameActive: true,
     }
     this.handleAction = this.handleAction.bind(this);
     this.pickUpChip = this.pickUpChip.bind(this);
@@ -23,7 +27,14 @@ class App extends React.Component {
     console.log(coords);
     var [ row, col ] = coords;
     var { board, pickedChip, activePlayerIndex, players } = this.state;
-    if (!pickedChip) {
+    var clickedCell = board[row][col];
+    var isSameColor = false;
+    if (clickedCell.chip) {
+      if (clickedCell.chip.color === players[activePlayerIndex].color) {
+         isSameColor = true; 
+      }
+    }
+    if (!pickedChip || isSameColor) {
       this.pickUpChip(coords);
     } else {
       this.placeChip(coords);
@@ -40,7 +51,7 @@ class App extends React.Component {
     }
     console.log('Picked up chip');
     this.setState({
-      pickedChip: { row: row, col: col, chip: board[row][col].chip }
+      pickedChip: { row: row, col: col, chip: board[row][col].chip } // Refactor this to just use chip's id instead of whole object
     })
   }
   
@@ -52,15 +63,22 @@ class App extends React.Component {
     var boardCopy = JSON.parse(JSON.stringify(board));
     var playersCopy = JSON.parse(JSON.stringify(players));
     var chipCopy = JSON.parse(JSON.stringify(pickedChip));
-    var result = BoardUtils.placeChip(chipCopy, coords, boardCopy, activePlayerIndex); 
+    var result = BoardUtils.placeChip(chipCopy, coords, boardCopy, activePlayerIndex); // Mutates boardCopy and chipCopy
     if (!result) {
       return;
     }
     if (result.captured) {
+      delete playersCopy[+!activePlayerIndex].chips[result.captured.id];
       playersCopy[+!activePlayerIndex].chipCount--;
     }
     console.log('Placed chip');
-    activePlayerIndex = +!activePlayerIndex;
+    var gameActive = true;
+    if ( playersCopy[+!activePlayerIndex].chipCount === 0 // Enemy chips are all captured!
+      || !BoardUtils.hasMoreMoves(playersCopy[+!activePlayerIndex].chips)) { // Enemy cannot make any more moves
+      
+    } else {
+      activePlayerIndex = +!activePlayerIndex; // Swap to other player
+    }
 
     this.setState({
       board: boardCopy,
