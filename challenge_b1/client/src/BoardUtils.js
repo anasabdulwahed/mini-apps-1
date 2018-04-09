@@ -6,7 +6,7 @@ BoardUtils.size = 8;
 
 BoardUtils.initBoard = function() {
   var size = this.size;
-  var colors = ['black', 'white'];
+  var colors = ['white', 'black'];
   var colorIndex = 0;
   var board = [];
   var boardRow = [];
@@ -17,13 +17,17 @@ BoardUtils.initBoard = function() {
     for (let j = 0; j < size; j++) {
       let color = colors[colorIndex];
       boardRow.push({color: color, chip: null});
-      if (i < 3 || i > 4) {
+      if (i < 3 || i > this.size-4) {
         if (color === 'black') {
           let chip = {isKing: false, id: chipId};
-          chip.color = i < 3 ? 'red' : 'blue';
+          chip.color = i < 3 ? 'blue' : 'red';
           chip.coords = [i, j];
           boardRow[boardRow.length-1].chip = chip;
-          i < 3 ? player1Chips[chipId] = chip : player2Chips[chipId] = chip;
+          if (i < 3) {
+            player2Chips[chipId] = chip;
+          } else if (i > this.size-4) {
+            player1Chips[chipId] = chip;
+          }
           chipId++;
         }
       }
@@ -37,7 +41,7 @@ BoardUtils.initBoard = function() {
 }
 
 // Will mutate board and chip if chip successfully placed
-BoardUtils.placeChip = function(chip, [newRow, newCol], board, invert, chainJump) {
+BoardUtils.placeChip = function(chip, [newRow, newCol], board, invert, isChainJumping) {
   console.log(chip);
   if (!chip) {
     return false;
@@ -51,7 +55,7 @@ BoardUtils.placeChip = function(chip, [newRow, newCol], board, invert, chainJump
   // }
   if (((chip.isKing && Math.abs(newRow - oldRow) === 1) || newRow - oldRow === direction) 
     && Math.abs(newCol - oldCol) === 1) {
-    if (chainJump) {
+    if (isChainJumping) { // To prevent a singular movement while doing chain jumps
       return false;
     }
     if (!this.canMoveOne([newRow, newCol], board)) { // Can't jump if there's a chip in landing spot
@@ -72,6 +76,9 @@ BoardUtils.placeChip = function(chip, [newRow, newCol], board, invert, chainJump
     }
     chip.coords = [newRow, newCol];
     if (newRow === end) {
+      if (!chip.isKing) {
+        result.stopChainJump = true;
+      }
       chip.isKing = true;
     }
     let rowMiddle = (oldRow + newRow) / 2; //get row in mid
@@ -90,7 +97,7 @@ BoardUtils.hasMoreMoves = function(chips, board, invert) {
   var ids = Object.keys(chips);
   var hasMoreMoves = false;
   _.forEach(ids, (id) => {
-    if (this.hasMoves(chips[id], board, invert, 1) || this.hasMoves(chips[id], board, invert, 2)) {
+    if (this.canMoveChip(chips[id], board, invert, 1) || this.canMoveChip(chips[id], board, invert, 2)) {
       hasMoreMoves = true;
       return false; // Break out of loop
     }
@@ -98,12 +105,12 @@ BoardUtils.hasMoreMoves = function(chips, board, invert) {
   return hasMoreMoves;
 }
 
-BoardUtils.hasMoves = function(chip, board, invert, range) { // range === 1: look for single moves, range === 2: look for jumps
+BoardUtils.canMoveChip = function(chip, board, invert, range) { // range === 1: look for single moves, range === 2: look for jumps
   var [row, col] = chip.coords;
   var spots = [];
   var direction = invert ? -1 * range : range;
-  var canFindSpot = range === 1 ? this.canMoveOne.bind(this) : this.canJump.bind(this);
-  var hasMoves = false;
+  var canPlace = range === 1 ? this.canMoveOne.bind(this) : this.canJump.bind(this);
+  var canMoveChip = false;
   spots.push([row+direction, col+range]);
   spots.push([row+direction, col-range]);
   if (chip.isKing) { // If is king, then investigate other two diagonal spots
@@ -111,12 +118,12 @@ BoardUtils.hasMoves = function(chip, board, invert, range) { // range === 1: loo
     spots.push([row-direction, col-range]);
   }
   _.forEach(spots, (spot) => {
-    if (canFindSpot(spot, board, chip)) {
-      hasMoves = true;
+    if (canPlace(spot, board, chip)) {
+      canMoveChip = true;
       return false;
     }
   });
-  return hasMoves;
+  return canMoveChip;
 }
 
 BoardUtils.canMoveOne = function([newRow, newCol], board) {

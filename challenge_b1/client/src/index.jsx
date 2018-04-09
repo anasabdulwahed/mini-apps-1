@@ -7,28 +7,31 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     let  { board, player1Chips, player2Chips } = BoardUtils.initBoard();
+    let player1ChipCount = Object.keys(player1Chips).length;
+    let player2ChipCount = Object.keys(player2Chips).length;
     this.state = {
       board: board,
       players: [
-        {name: 'Player 1', color: 'red', chipCount: 12, chips: player1Chips}, 
-        {name: 'Player 2', color: 'blue', chipCount: 12, chips: player2Chips}
+        {name: 'Player 2', color: 'blue', chipCount: player2ChipCount, chips: player2Chips}, 
+        {name: 'Player 1', color: 'red', chipCount: player1ChipCount, chips: player1Chips}
       ],
       activePlayerIndex: 0,
       pickedChipId: null,   
       placedChip: true,
       gameActive: true,
-      winner: null,
+      winner: {},
       tie: false, 
     }
     this.handleAction = this.handleAction.bind(this);
     this.pickUpChip = this.pickUpChip.bind(this);
     this.placeChip = this.placeChip.bind(this);
+    this.resetGame = this.resetGame.bind(this);
   }
 
   handleAction(coords) {
     console.log(coords);
     var [ row, col ] = coords;
-    var { board, pickedChipId, activePlayerIndex, players } = this.state;
+    var { board, pickedChipId, activePlayerIndex, players, isChainJumping } = this.state;
     var clickedCell = board[row][col];
     var isSameColor = false;
     if (clickedCell.chip) {
@@ -36,7 +39,7 @@ class App extends React.Component {
          isSameColor = true; 
       }
     }
-    if (!pickedChipId || isSameColor) {
+    if ((!pickedChipId || isSameColor) && !isChainJumping) {
       this.pickUpChip(coords);
     } else {
       this.placeChip(coords);
@@ -58,7 +61,7 @@ class App extends React.Component {
   }
   
   placeChip(coords) {
-    var { board, pickedChipId, activePlayerIndex, players, chainJump } = this.state;
+    var { board, pickedChipId, activePlayerIndex, players, isChainJumping } = this.state;
     if (!pickedChipId) {
       return;
     }
@@ -67,7 +70,7 @@ class App extends React.Component {
     var player = playersCopy[activePlayerIndex];
     var enemy = playersCopy[+!activePlayerIndex];
     var chipCopy = player.chips[pickedChipId];
-    var result = BoardUtils.placeChip(chipCopy, coords, boardCopy, activePlayerIndex, chainJump); // Mutates boardCopy and chipCopy
+    var result = BoardUtils.placeChip(chipCopy, coords, boardCopy, activePlayerIndex, isChainJumping); // Mutates boardCopy and chipCopy
     if (!result) {
       return;
     }
@@ -79,27 +82,34 @@ class App extends React.Component {
     var gameActive = true;
     var playerHasMoreMoves = BoardUtils.hasMoreMoves(player.chips, boardCopy, activePlayerIndex);
     var enemyHasMoreMoves = BoardUtils.hasMoreMoves(enemy.chips, boardCopy, +!activePlayerIndex);
-    var winner = null;
+    var winner = {};
     var tie = false;
-    var chainJump = false;
+    var isChainJumping = false;
     if (!enemyHasMoreMoves || !playerHasMoreMoves) { 
       gameActive = false;
-      if (enemyHasMoreMoves) {
-        winner = enemy.name; 
+      if (enemy.chipCount === 0) { // Can be a cause for enemy having no more moves
+        winner.name = player.name;
+        winner.reason =  `${enemy.name}'s chips have all been captured!`;
+      } else if (enemyHasMoreMoves) {
+        winner.name = enemy.name; 
+        winner.reason = `${player.name} has ran out of valid moves!`;
       } else if (playerHasMoreMoves) {
-        winner = player.name;
+        winner.name = player.name;
+        winner.reason = `${enemy.name} has ran out of valid moves!`;
       } else {
         if (player.chipCount > enemy.chipCount) {
-          winner = player.name;
+          winner.name = player.name;
+          winner.reason = `${player.name} has more surviving chips!`;
         } else if (player.chipCount < enemy.chipCount) {
-          winner = enemy.name;
+          winner.name = enemy.name;
+          winner.reason = `${enemy.name} has more surviving chips!`;
         } else {
           tie = true;
         }
       }
       pickedChipId = null;
-    } else if (BoardUtils.hasMoves(chipCopy, boardCopy, activePlayerIndex, 2) && result.captured) { // Can chain jumps
-      chainJump = true;
+    } else if (BoardUtils.canMoveChip(chipCopy, boardCopy, activePlayerIndex, 2) && result.captured && !result.stopChainJump) { // Can chain jumps
+      isChainJumping = true;
     } else {  
       activePlayerIndex = +!activePlayerIndex; // Swap to other player
       pickedChipId = null;
@@ -113,7 +123,7 @@ class App extends React.Component {
       gameActive: gameActive,
       winner: winner,
       tie: tie,
-      chainJump: chainJump
+      isChainJumping: isChainJumping
     })
   }
 
@@ -122,11 +132,33 @@ class App extends React.Component {
       return '';
     }
     if (winner) {
-      return `${winner} wins!!`;
+      return <div><h2>{`${winner.name} wins!!`}</h2><h4>{`${winner.reason}`}</h4></div>;
     }
     if (tie) {
-      return `It's a draw!`;
+      return <h2>{`Golly, it's a draw!`}</h2>;
     }
+  }
+
+  resetGame() {
+    let  { board, player1Chips, player2Chips } = BoardUtils.initBoard();
+    let player1ChipCount = Object.keys(player1Chips).length;
+    let player2ChipCount = Object.keys(player2Chips).length;
+    let activePlayerIndex;
+    this.state.gameActive ? activePlayerIndex = 1 : activePlayerIndex = this.state.activePlayerIndex;
+
+    this.setState({
+      board: board,
+      players: [ 
+        {name: 'Player 2', color: 'blue', chipCount: player2ChipCount, chips: player2Chips},
+        {name: 'Player 1', color: 'red', chipCount: player1ChipCount, chips: player1Chips}
+      ],  
+      pickedChipId: null,  
+      activePlayerIndex: activePlayerIndex,
+      placedChip: true,
+      gameActive: true,
+      winner: {},
+      tie: false, 
+    });
   }
   
   render() {
@@ -136,13 +168,14 @@ class App extends React.Component {
     return (
       <div>
         <Board board={this.state.board} handleAction={this.handleAction}/>
-        <div>
-          <h2>{resultMsg}</h2>
-        </div>
-        <h4>{`It is ${activePlayer.name}'s turn (${activePlayer.color})`}</h4>
-        <div>
-          <p>{`${players[0].name}: ${players[0].chipCount} chips remaining`}</p>
-          <p>{`${players[1].name}: ${players[1].chipCount} chips remaining`}</p>
+        <div style={{ margin: 'auto', width: '500px', textAlign: 'center'}}>
+          <div>{resultMsg}</div>
+          <h4>{gameActive ? `It is ${activePlayer.name}'s turn (${activePlayer.color})` : null}</h4>
+          <div>
+            <p>{`${players[1].name} (${players[1].color}): ${players[1].chipCount} chips remaining`}</p>
+            <p>{`${players[0].name} (${players[0].color}): ${players[0].chipCount} chips remaining`}</p>
+          </div>
+          <button onClick={this.resetGame}>Reset Game</button>
         </div>
       </div>
     );
