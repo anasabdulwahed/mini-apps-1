@@ -12,7 +12,7 @@ BoardUtils.initBoard = function() {
   var boardRow = [];
   var player1Chips = {};
   var player2Chips = {};
-  var chipId = 0;
+  var chipId = 1;
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       let color = colors[colorIndex];
@@ -36,24 +36,28 @@ BoardUtils.initBoard = function() {
   return { board: board, player1Chips: player1Chips, player2Chips: player2Chips }; 
 }
 
-// Will mutate board if chip successfully placed
-BoardUtils.placeChip = function(chipToPlace, [newRow, newCol], board, playerChips, invert) {
-  console.log(chipToPlace);
-  if (!chipToPlace) {
+// Will mutate board and chip if chip successfully placed
+BoardUtils.placeChip = function(chip, [newRow, newCol], board, invert, chainJump) {
+  console.log(chip);
+  if (!chip) {
     return false;
   }
   var direction = invert ? -1 : 1;
   var end = invert ? 0 : board.length-1;
-  var { row: oldRow, col: oldCol, chip } = chipToPlace;
+  var [oldRow, oldCol] = chip.coords;
   var result = { captured: null };
   // if (direction * newRow - row || Math.abs(newCol - col) !== 1) {
   //   return;
   // }
   if (((chip.isKing && Math.abs(newRow - oldRow) === 1) || newRow - oldRow === direction) 
     && Math.abs(newCol - oldCol) === 1) {
-    if (board[newRow][newCol].chip) { // Can't jump if there's a chip in landing spot
+    if (chainJump) {
       return false;
     }
+    if (!this.canMoveOne([newRow, newCol], board)) { // Can't jump if there's a chip in landing spot
+      return false;
+    }
+    chip.coords = [newRow, newCol];
     if (newRow === end) {
       chip.isKing = true;
     }
@@ -63,14 +67,15 @@ BoardUtils.placeChip = function(chipToPlace, [newRow, newCol], board, playerChip
   } 
   if (((chip.isKing && Math.abs(newRow - oldRow) === 2) || newRow - oldRow === 2 * direction) 
     && Math.abs(newCol - oldCol) === 2) {
-    var rowMiddle = (oldRow + newRow) / 2; //get row in mid
-    var colMiddle = (oldCol + newCol) / 2; // Get col in mid 
-    if (!this.canJump([oldRow, oldCol], [newRow, newCol], chip, board)) { // Can't jump if there's a chip in landing spot
+    if (!this.canJump([newRow, newCol], board, chip)) { // Can't jump if there's a chip in landing spot
       return false;
     }
+    chip.coords = [newRow, newCol];
     if (newRow === end) {
       chip.isKing = true;
     }
+    let rowMiddle = (oldRow + newRow) / 2; //get row in mid
+    let colMiddle = (oldCol + newCol) / 2; // Get col in mid 
     let capturedChip = board[rowMiddle][colMiddle].chip;
     board[oldRow][oldCol].chip = null; // Remove player chip from old spot
     board[newRow][newCol].chip = chip; // Place player chip in new spot
@@ -81,11 +86,11 @@ BoardUtils.placeChip = function(chipToPlace, [newRow, newCol], board, playerChip
   return false;
 };
 
-BoardUtils.hasMoreMoves = function(chips, board) {
+BoardUtils.hasMoreMoves = function(chips, board, invert) {
   var ids = Object.keys(chips);
   var hasMoreMoves = false;
   _.forEach(ids, (id) => {
-    if (this.hasSingleMoves(chips[id], board) || this.hasJumps(chips[id], board)) {
+    if (this.hasMoves(chips[id], board, invert, 1) || this.hasMoves(chips[id], board, invert, 2)) {
       hasMoreMoves = true;
       return false; // Break out of loop
     }
@@ -93,11 +98,44 @@ BoardUtils.hasMoreMoves = function(chips, board) {
   return hasMoreMoves;
 }
 
-BoardUtils.hasSingleMoves = function(chip, board) {
-  var [row, col] = 
+BoardUtils.hasMoves = function(chip, board, invert, range) { // range === 1: look for single moves, range === 2: look for jumps
+  var [row, col] = chip.coords;
+  var spots = [];
+  var direction = invert ? -1 * range : range;
+  var canFindSpot = range === 1 ? this.canMoveOne.bind(this) : this.canJump.bind(this);
+  var hasMoves = false;
+  spots.push([row+direction, col+range]);
+  spots.push([row+direction, col-range]);
+  if (chip.isKing) { // If is king, then investigate other two diagonal spots
+    spots.push([row-direction, col+range]);
+    spots.push([row-direction, col-range]);
+  }
+  _.forEach(spots, (spot) => {
+    if (canFindSpot(spot, board, chip)) {
+      hasMoves = true;
+      return false;
+    }
+  });
+  return hasMoves;
 }
 
-BoardUtils.canJump = function([oldRow, oldCol], [newRow, newCol], chip, board) {
+BoardUtils.canMoveOne = function([newRow, newCol], board) {
+  if (newRow > this.size-1 || newRow < 0 
+    || newCol > this.size-1 || newCol < 0) {
+    return false;
+  }
+  if (board[newRow][newCol].chip) {
+    return false;
+  }
+  return true;
+}
+
+BoardUtils.canJump = function( [newRow, newCol], board, chip) {
+  if (newRow > this.size-1 || newRow < 0 
+    || newCol > this.size-1 || newCol < 0) {
+    return false;
+  }
+  var [oldRow, oldCol] = chip.coords;
   var rowMiddle = (oldRow + newRow) / 2; //get row in mid
   var colMiddle = (oldCol + newCol) / 2; // Get col in mid
   var isSameColor = false;
