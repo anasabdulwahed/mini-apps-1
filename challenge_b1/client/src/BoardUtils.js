@@ -138,8 +138,8 @@ BoardUtils.canMoveOne = function([newRow, newCol], board) {
 }
 
 BoardUtils.canJump = function( [newRow, newCol], board, chip) {
-  if (newRow > this.size-1 || newRow < 0 
-    || newCol > this.size-1 || newCol < 0) {
+  if (newRow > board.length-1 || newRow < 0 
+    || newCol > board.length-1 || newCol < 0) {
     return false;
   }
   var [oldRow, oldCol] = chip.coords;

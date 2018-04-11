@@ -15,7 +15,7 @@ class App extends React.Component {
         {name: 'Player 2', color: 'blue', chipCount: player2ChipCount, chips: player2Chips}, 
         {name: 'Player 1', color: 'red', chipCount: player1ChipCount, chips: player1Chips}
       ],
-      activePlayerIndex: 0,
+      activePlayerIndex: 1,
       pickedChipId: null,   
       placedChip: true,
       gameActive: true,
@@ -30,6 +30,9 @@ class App extends React.Component {
 
   handleAction(coords) {
     console.log(coords);
+    if (!this.state.gameActive) {
+      return;
+    }
     var [ row, col ] = coords;
     var { board, pickedChipId, activePlayerIndex, players, isChainJumping } = this.state;
     var clickedCell = board[row][col];
@@ -87,15 +90,17 @@ class App extends React.Component {
     var isChainJumping = false;
     if (!enemyHasMoreMoves || !playerHasMoreMoves) { 
       gameActive = false;
-      if (enemy.chipCount === 0) { // Can be a cause for enemy having no more moves
-        winner.name = player.name;
-        winner.reason =  `${enemy.name}'s chips have all been captured!`;
-      } else if (enemyHasMoreMoves) {
+      if (enemyHasMoreMoves) {
         winner.name = enemy.name; 
-        winner.reason = `${player.name} has ran out of valid moves!`;
+        winner.reason = `${player.name} has run out of valid moves!`;
       } else if (playerHasMoreMoves) {
-        winner.name = player.name;
-        winner.reason = `${enemy.name} has ran out of valid moves!`;
+        if (enemy.chipCount === 0) { // Can be a cause for enemy having no more moves
+          winner.name = player.name;
+          winner.reason =  `${enemy.name}'s chips have all been captured!`;
+        } else {
+          winner.name = player.name;
+          winner.reason = `${enemy.name} has run out of valid moves!`;  
+        }
       } else {
         if (player.chipCount > enemy.chipCount) {
           winner.name = player.name;
@@ -162,15 +167,21 @@ class App extends React.Component {
   }
   
   render() {
-    let { board, players, activePlayerIndex, gameActive, winner, tie } = this.state;
+    let { board, players, activePlayerIndex, gameActive, winner, tie, pickedChipId, isChainJumping } = this.state;
     let activePlayer = players[activePlayerIndex];
     let resultMsg = this.createResultMsg(gameActive, winner, tie);
     return (
       <div>
-        <Board board={this.state.board} handleAction={this.handleAction}/>
+        <Board 
+          board={this.state.board} 
+          handleAction={this.handleAction} 
+          activeColor={activePlayer.color}
+          pickedChipId={pickedChipId}
+        />
         <div style={{ margin: 'auto', width: '500px', textAlign: 'center'}}>
           <div>{resultMsg}</div>
-          <h4>{gameActive ? `It is ${activePlayer.name}'s turn (${activePlayer.color})` : null}</h4>
+          <h4>{gameActive ? `It is ${activePlayer.name}'s turn (${activePlayer.color})
+            ${isChainJumping ? ', can jump again': ''}` : null}</h4>
           <div>
             <p>{`${players[1].name} (${players[1].color}): ${players[1].chipCount} chips remaining`}</p>
             <p>{`${players[0].name} (${players[0].color}): ${players[0].chipCount} chips remaining`}</p>

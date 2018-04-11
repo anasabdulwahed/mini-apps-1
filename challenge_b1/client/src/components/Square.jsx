@@ -1,17 +1,25 @@
 import React from 'react';
 
-const Square = ({coords, cell, onClick}) => {
-  const { color, chip } = cell;
+const Square = ({coords, cell, onClick, activeColor, pickedChipId}) => {
+  const { color, chip } = cell; 
   return (
-    <div style={{ height: '50px', backgroundColor: color }} onClick={() => {onClick(coords);}}>
-      {chip ? <div className="chip" style={{ 
-        backgroundColor: chip.color, 
-        border: chip.isKing ? '5px solid yellow' : null, 
-        marginTop: chip.isKing ? '0px' : '5px'}}
+    <div 
+      className={`${pickedChipId && !chip ? 'turn-active' : ''}`} 
+      style={{ height: '50px', backgroundColor: color }} 
+      onClick={() => {onClick(coords);}}
+    >
+      {chip ? 
+      <img 
+        className={`chip ${chip.color === activeColor ? 'active': ''} ${chip.id === pickedChipId ? 'selected' : ''}`} 
+        src={`img/${chip.color}_${chip.isKing ? 'king' : 'basic'}.png`}
       >
-      </div> : null}
+      </img>
+      : null}
     </div>
   )
 };
 
 export default Square;
+
+/* <div className={`chip ${chip.color}${chip.isKing ? '-king' : ''}`}>
+</div> */

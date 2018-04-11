@@ -1,8 +1,27 @@
 .chip {
-  height: 40px;
-  width: 40px;
-  border-radius: 20px;
+  height: 50px;
+  width: 50px;
+  border-radius: 25px;
   margin: auto;
-  margin-top: 5px;
-  margin-bottom: auto;
+}
+
+.active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.active:hover {
+  filter: brightness(400%); 
+}
+
+.selected {
+  filter: brightness(400%);
+}
+
+.turn-active {
+  cursor: pointer;
+}
+
+.turn-active:hover {
+  opacity: 0.5
 }
