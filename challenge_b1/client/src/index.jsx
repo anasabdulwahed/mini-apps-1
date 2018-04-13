@@ -9,23 +9,28 @@ class App extends React.Component {
     let  { board, player1Chips, player2Chips } = BoardUtils.initBoard();
     let player1ChipCount = Object.keys(player1Chips).length;
     let player2ChipCount = Object.keys(player2Chips).length;
+    let totalImgCount = player1ChipCount + player2ChipCount + 1;
     this.state = {
       board: board,
       players: [
         {name: 'Player 2', color: 'blue', chipCount: player2ChipCount, chips: player2Chips}, 
         {name: 'Player 1', color: 'red', chipCount: player1ChipCount, chips: player1Chips}
       ],
+      totalImgCount: totalImgCount,
       activePlayerIndex: 1,
       pickedChipId: null,   
       placedChip: true,
       gameActive: true,
       winner: {},
       tie: false, 
+      render: false,
+      renderedImgCount: 0
     }
     this.handleAction = this.handleAction.bind(this);
     this.pickUpChip = this.pickUpChip.bind(this);
     this.placeChip = this.placeChip.bind(this);
     this.resetGame = this.resetGame.bind(this);
+    this.onImageLoad = this.onImageLoad.bind(this);
   }
 
   handleAction(coords) {
@@ -47,6 +52,20 @@ class App extends React.Component {
     } else {
       this.placeChip(coords);
     }
+  }
+
+  onImageLoad() {
+    let { renderedImgCount, totalImgCount } = this.state;
+    if (this.state.renderedImgCount === totalImgCount) {
+      return;
+    }
+    renderedImgCount = renderedImgCount + 1;
+    let render = renderedImgCount === totalImgCount; 
+    console.log(renderedImgCount);
+    this.setState({
+      renderedImgCount: renderedImgCount,
+      render: render
+    })
   }
 
   pickUpChip([ row, col ]) {
@@ -136,11 +155,11 @@ class App extends React.Component {
     if (gameActive) {
       return '';
     }
-    if (winner) {
-      return <div><h2>{`${winner.name} wins!!`}</h2><h4>{`${winner.reason}`}</h4></div>;
-    }
     if (tie) {
       return <h2>{`Golly, it's a draw!`}</h2>;
+    }
+    if (winner) {
+      return <div><h2>{`${winner.name} wins!!`}</h2><h4>{`${winner.reason}`}</h4></div>;
     }
   }
 
@@ -167,18 +186,32 @@ class App extends React.Component {
   }
   
   render() {
-    let { board, players, activePlayerIndex, gameActive, winner, tie, pickedChipId, isChainJumping } = this.state;
+    let { board, players, activePlayerIndex, gameActive, winner, tie, pickedChipId, isChainJumping, render } = this.state;
     let activePlayer = players[activePlayerIndex];
     let resultMsg = this.createResultMsg(gameActive, winner, tie);
+
+    
+    let borderStyle = {
+      width: `${board.length * 60}px`, 
+      height: `${board.length * 60}px`, 
+      backgroundImage: 'url("img/wood-background2.jpg")',
+      border: '1px solid',
+      margin: 'auto',
+      marginBottom: '5px'
+    };
+    
     return (
-      <div>
-        <Board 
-          board={this.state.board} 
-          handleAction={this.handleAction} 
-          activeColor={activePlayer.color}
-          pickedChipId={pickedChipId}
-        />
-        <div style={{ margin: 'auto', width: '500px', textAlign: 'center'}}>
+      <div style={{ display: render ? 'initial' : 'none' }}>
+        <div className="border" style={borderStyle}>
+          <Board 
+            board={this.state.board} 
+            handleAction={this.handleAction} 
+            activeColor={activePlayer.color}
+            pickedChipId={pickedChipId}
+            onImageLoad={this.onImageLoad}
+          />
+        </div>
+        <div style={{ margin: 'auto', marginTop: '5px', width: '500px', textAlign: 'center'}}>
           <div>{resultMsg}</div>
           <h4>{gameActive ? `It is ${activePlayer.name}'s turn (${activePlayer.color})
             ${isChainJumping ? ', can jump again': ''}` : null}</h4>
@@ -188,12 +221,16 @@ class App extends React.Component {
           </div>
           <button onClick={this.resetGame}>Reset Game</button>
         </div>
+        <div style={{ display: 'none' }}>
+          <img src="img/wood-background2.jpg" onLoad={this.onImageLoad}/>
+        </div>
       </div>
     );
   }
-}
+};
 
 ReactDOM.render(
   <App/>,
   document.getElementById('app')
 );
+

@@ -1,13 +1,17 @@
 import React from 'react';
 import Square from './Square.jsx';
 
-const Board = ({board, handleAction, activeColor, pickedChipId}) => {
+const Board = ({board, handleAction, activeColor, pickedChipId, onImageLoad}) => {
   const boardStyle = { 
     display: 'grid', 
     width: `${board.length * 50}px`,
     gridTemplateColumns: `repeat(${board.length}, 50px)`,
-    border: '1px solid black',
+    backgroundColor: 'white',
+    borderColor: 'black brown brown black',
+    borderStyle: 'solid',
+    borderWidth: '6px 4px 4px 6px',
     margin: 'auto',
+    marginTop: '40px',
   }
   
   return (
@@ -20,6 +24,7 @@ const Board = ({board, handleAction, activeColor, pickedChipId}) => {
             activeColor={activeColor} 
             pickedChipId = {pickedChipId}
             onClick={handleAction}
+            onImageLoad={onImageLoad}
           />
         )
       )}
