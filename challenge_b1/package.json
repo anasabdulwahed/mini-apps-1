@@ -9,6 +9,9 @@
     "run:dev": "nodemon server.js", 
     "build": "webpack -d --watch"
   },
+  "engines": {
+    "node": "8.6.0"
+  },
   "author": "Albert Lee",
   "license": "ISC",
   "devDependencies": {
