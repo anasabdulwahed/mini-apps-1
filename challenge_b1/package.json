@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "run:dev": "nodemon server.js", 
-    "build": "webpack -d --watch"
+    "dev:server": "nodemon server.js", 
+    "dev:client": "webpack -d --watch"
   },
   "engines": {
     "node": "8.6.0"

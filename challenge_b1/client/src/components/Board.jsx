@@ -1,7 +1,7 @@
 import React from 'react';
 import Square from './Square.jsx';
 
-const Board = ({board, handleAction, activeColor, pickedChipId, onImageLoad}) => {
+const Board = ({board, handleAction, activeColor, pickedChipId}) => {
   const boardStyle = { 
     display: 'grid', 
     width: `${board.length * 50}px`,
@@ -24,7 +24,6 @@ const Board = ({board, handleAction, activeColor, pickedChipId, onImageLoad}) =>
             activeColor={activeColor} 
             pickedChipId = {pickedChipId}
             onClick={handleAction}
-            onImageLoad={onImageLoad}
           />
         )
       )}

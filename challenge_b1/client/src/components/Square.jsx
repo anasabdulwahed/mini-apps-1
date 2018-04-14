@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Square = ({coords, cell, onClick, activeColor, pickedChipId, onImageLoad}) => {
+const Square = ({coords, cell, onClick, activeColor, pickedChipId}) => {
   const { color, chip } = cell; 
   return (
     <div 
@@ -12,7 +12,6 @@ const Square = ({coords, cell, onClick, activeColor, pickedChipId, onImageLoad})
       <img 
         className={`chip ${chip.color === activeColor ? 'active': ''} ${chip.id === pickedChipId ? 'selected' : ''}`} 
         src={`img/${chip.color}_${chip.isKing ? 'king' : 'basic'}.png`}
-        onLoad={onImageLoad}
       >
       </img>
       : null}

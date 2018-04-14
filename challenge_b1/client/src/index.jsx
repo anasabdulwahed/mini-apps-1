@@ -9,7 +9,7 @@ class App extends React.Component {
     let  { board, player1Chips, player2Chips } = BoardUtils.initBoard();
     let player1ChipCount = Object.keys(player1Chips).length;
     let player2ChipCount = Object.keys(player2Chips).length;
-    let totalImgCount = player1ChipCount + player2ChipCount + 1;
+    let totalImgCount = 5;
     this.state = {
       board: board,
       players: [
@@ -208,7 +208,6 @@ class App extends React.Component {
             handleAction={this.handleAction} 
             activeColor={activePlayer.color}
             pickedChipId={pickedChipId}
-            onImageLoad={this.onImageLoad}
           />
         </div>
         <div style={{ margin: 'auto', marginTop: '5px', width: '500px', textAlign: 'center'}}>
@@ -223,6 +222,10 @@ class App extends React.Component {
         </div>
         <div style={{ display: 'none' }}>
           <img src="img/wood-background2.jpg" onLoad={this.onImageLoad}/>
+          <img src="img/blue_king.png" onLoad={this.onImageLoad}/>
+          <img src="img/blue_basic.png" onLoad={this.onImageLoad}/>
+          <img src="img/red_king.png" onLoad={this.onImageLoad}/>
+          <img src="img/red_basic.png" onLoad={this.onImageLoad}/>
         </div>
       </div>
     );
